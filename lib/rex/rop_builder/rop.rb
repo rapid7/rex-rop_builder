@@ -2,21 +2,20 @@
 require 'metasm'
 require 'rex/compat'
 require 'rex/text/table'
-require 'rex/ui/text/output/stdio'
 require 'rex/text/color'
 
 module Rex
 module RopBuilder
 
 class RopBase
+  include Rex::Text::Color
   def initialize()
-    @stdio = Rex::Ui::Text::Output::Stdio.new
     @gadgets = []
   end
 
   def to_csv(gadgets = [])
     if gadgets.empty? and @gadgets.nil? or @gadgets.empty?
-      @stdio.print_error("No gadgets collected to convert to CSV format.")
+      print_error("No gadgets collected to convert to CSV format.")
       return
     end
 
@@ -46,7 +45,7 @@ class RopBase
     begin
       data = File.new(file, 'r').read
     rescue
-      @stdio.print_error("Error reading #{file}")
+      print_error("Error reading #{file}")
       return []
     end
 
@@ -62,7 +61,7 @@ class RopBase
     data.each_line do |line|
       addr, raw, disasm = line.split(',', 3)
       if addr.nil? or raw.nil? or disasm.nil?
-        @stdio.print_error("Import file format corrupted")
+        print_error("Import file format corrupted")
         return []
       end
       disasm.gsub!(/: /, ":\t")
@@ -73,23 +72,28 @@ class RopBase
       @gadgets
   end
 
-  def print_msg(msg, color=true)
-    if not @stdio
-      @stdio = Rex::Ui::Text::Output::Stdio.new
-    end
+  def supports_color?
+    true
+  end
 
-    if color == true
-      @stdio.auto_color
-    else
-        @stdio.disable_color
+  def print_error(msg = '')
+    print_msg("%bld%red[-]%clr #{msg}")
+  end
+
+  def print_msg(msg, color=true)
+    if color
+      msg = substitute_colors(msg)
     end
-    @stdio.print_raw(@stdio.substitute_colors(msg))
+    puts msg
+  end
+
+  def print_status(msg = '')
+    print_msg("%bld%blu[*]%clr #{msg}")
   end
 end
 
 class RopCollect < RopBase
   def initialize(file="")
-    @stdio = Rex::Ui::Text::Output::Stdio.new
     @file = file if not file.empty?
     @bin = Metasm::AutoExe.decode_file(file) if not file.empty?
     @disassembler = @bin.disassembler if not @bin.nil?
@@ -156,7 +160,7 @@ class RopCollect < RopBase
       end
     end
     matches.each do |match|
-      @stdio.print_status("gadget with address: %bld%cya#{match[:gadget][:address]}%clr matched")
+      print_status("gadget with address: %bld%cya#{match[:gadget][:address]}%clr matched")
       color_pattern(match[:gadget], match[:disasm], match[:addrs], p)
     end
     matches
