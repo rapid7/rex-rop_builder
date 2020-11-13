@@ -6,8 +6,8 @@ require 'rex/rop_builder/version'
 Gem::Specification.new do |spec|
   spec.name          = "rex-rop_builder"
   spec.version       = Rex::RopBuilder::VERSION
-  spec.authors       = ["David Maloney"]
-  spec.email         = ["DMaloney@rapid7.com"]
+  spec.authors       = ['Metasploit Hackers']
+  spec.email         = ['msfdev@metasploit.com']
 
   spec.summary       = %q{Ruby Exploitation(Rex) Library for building ROP chains.}
   spec.homepage      = "https://github.com/rapid7/rex-rop_builder"
@@ -21,9 +21,8 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.2.0'
 
-  spec.add_development_dependency "bundler", "~> 1.12"
-  spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "rake"
+  spec.add_development_dependency "rspec"
 
   spec.add_runtime_dependency "metasm"
   spec.add_runtime_dependency "rex-core"
